@@ -1,58 +1,54 @@
-# ThingSpeak Guide + temperature / humidity sensor guide (Dragino Lora Shield)
-This guide is a continuation of the `Dragino Lora Shield Guide` and will make use of the application and device set up during the guide.
+# Temperature & Humidity (with Arduino + Dragino Lora Shield)
+This guide is a continuation of the `Getting Started with the Arduino and Dragino Guide` and will make use of the application (on The Things Network) and device (physical Arduino + Dragino) set up during that guide. If you haven't followed the previous guide you will need to do that first, and  have:
+- The Arduino and Dragino connected correctly, with an antenna
+- The Arduino connected your computer, and communicating correctly
+- The Arduino IDE installed
+- The `MCCI LoRaWAN LMIC library` installed and configured correctly, and
+- The Arduino/Dragino registered and communicating with The Things Network
 
 ## What you will need
-To Follow along with this guide you will need the following things:
-- An [Arduino Uno](https://www.jaycar.com.au/duinotech-uno-r3-development-board/p/XC4410) or [Arduino Mega](https://www.jaycar.com.au/duinotech-mega-2560-r3-board-for-arduino/p/XC4420)
-- A [Dragino Lora Shield](https://www.jaycar.com.au/arduino-compatible-long-range-lora-shield/p/XC4392) for the Arduino
-- A computer to connect to the Arduino and write the code
-- A usb A to usb B cable to connect the Arduino to your computer
+To follow this guide, you will The setup from the previous guide, with the addition of:
 - A Keyestudio DHT22 Temperature and Humidity Sensor Module
 - A breadboard and 3 wires OR some other way to connect the sensor to the Arduino
 
-## Step 1 - Set up ThingSpeak
-In order to store and make use of our data we will be creating a channel using ThingSpeak.
-- First create a ThingSpeak account [here](https://thingspeak.com/)
-- After creating an account and signing in, go to the My Channels page by clicking `Channels > My Channels` on the top nav bar
-- Click the New Channel button
-- In the Name textbox enter an appropriate name like `Temperature / Humidity Sensor`
-- Ensure that the first 3 fields have a tick in their checkbox
-- In field 1 enter `Humidity`
-- In field 2 enter `Temperature`
-- In field 3 enter `Heat Index`
-- The rest of the options can be left blank for now so scroll to the bottom of the page and press the `Save Channel` button
+You will still need to be in range of a Gateway connected to The Things Network which you can find out about [here](https://www.thethingsnetwork.org/community).
 
-This will take you to the private view of your new channel where you will have a graph for each of the fields, we entered earlier
+## Step 1 - Install Library
+Install a library to help use the soil moisture sensor.
 
-## Step 2 - Connect ThingSpeak to The Things Network
-Now that your  ThingSpeak account has been created, and channel has been set up,  The Things Network Application needs to send any data it receives to our new channel:
-- Sign into The Things Network
-- Go to `Console > Applications` and select the application that you want to connect to ThingSpeak 
-- Click on the `Integrations` heading
-- Click on the `add integration` button
-- Click on the `ThingSpeak` option
-- Enter a unique name for the integration process in the `Process ID` field
-- Copy the write API key from the `API Keys` section of the ThingSpeak channel created in Step 1 into the `Authorization` field
-- Copy the `Channel ID` from the top of the ThingSpeak Channel created in Step 1 into the `Channel ID` field
-- Click `Add Integration`
+In the Arduino IDE:
+- Go to `Tools -> Manage Libraries`
+- Search for `DHT22` using the search box
+- Install the `DHT sensor library` library
+    - If asked to _install missing dependencies?_, choose _Install all_
 
-## Step 3 - Setup the board
+![Install Soil Moisture Library](readme-images/library.png)
+
+## Step 2 - Setup the board
 To connect the sensor to the Arduino we will be using a breadboard.
-A breadboard has a number of rows typically labelled with numbers and a number of columns typically labelled with letters.
-- First attach the Lora Shield to the Arduino by slotting the shields bottom pins into the Arduino ports, ensuring that the pins labels on the shield match with the port labels on the Arduino (e.g., the GND pin on the shield enters the GND port on the Arduino).
 
-- Once the Lora shield is attached to the Arduino take the antenna that came with the Lora shield and attach it to the metal input on the shield and fasten the hand screw to fix it in place.
+A breadboard has a number of rows typically labelled with numbers and a number of columns typically labelled with letters. To learn more about breadboards and how to use them, follow this [link](https://learn.sparkfun.com/tutorials/how-to-use-a-breadboard/all).
 
-- Insert the pins from the DHT22 Sensor into the breadboard so that they all enter a column of the same letter.
-- In the same numbered row that the sensors GND pin is connected to insert a wire into the breadboard and connect it to one of the GND sockets on the Dragino Lora Shield.
-- In the same numbered row that the sensors VCC pin is connected to insert a wire into the breadboard and connect it to the 5V socket on the Dragino Lora Shield.
-- In the same numbered row that the sensors S (or DAT) pin is connected to insert a wire into the breadboard and connect it to the digital 3 socket on the Dragino Lora Shield.
+Building on the setup completed in `Getting Started with the Arduino and Dragino guide`:
 
-## Step 4 - Setup the code
+1. Insert the pins from the DHT22
+    - Each leg should be in a different row, but the same column.
+1. In the same numbered row that the sensors GND pin is connected to insert a wire into the breadboard and connect it to one of the GND sockets on the Dragino Lora Shield.
+1. In the same numbered row that the sensors VCC pin is connected to insert a wire into the breadboard and connect it to the 5V socket on the Dragino Lora Shield.
+1. In the same numbered row that the sensors S (or DAT) pin is connected to insert a wire into the breadboard and connect it to the digital 3 socket on the Dragino Lora Shield.
+
+![Arduino Physical Setup](readme-images/physical-setup.jpg)
+
+## Step 3 - The Arduino Code
 Now that the sensor is connected to the Arduino, the code needs to be modified from the `Dragino Lora Shield Guide` to send the sensor data instead of the static letters in the myData variable.
-- Open up a copy of the Arduino IDE code you created in the `Dragino Lora Shield Guide`.
-- Near the top of the page under the `#include <SPI.h>` line, add the following code 
-```
+
+> Make sure you get the code from the `Dragino Lora Shield Guide` which importantly has the APPEUI, DEVEUI, APPKEY and Pin Mapping configuration correct.
+
+Open up a copy of the Arduino IDE code you created in the `Dragino Lora Shield Guide`.
+
+Near the top of the code under the `#include <SPI.h>` line, add the following code
+
+```C++
 #include "DHT.h"
 
 #define DHTPIN 3 // Digital pin connected to the DHT sensor
@@ -60,34 +56,66 @@ Now that the sensor is connected to the Arduino, the code needs to be modified f
 
 DHT dht(DHTPIN, DHTTYPE);
 ```
-- In the `void setup()` function near the bottom of the code, Add the line `dht.begin();` above the `//LMIC init` comment
--  Find the `void do_send(osjob_t* j)` function and enter in the following code just below the `} else {` line and above the `// Prepare upstream data transmission at the next possible time.` comment
+
+In the `void setup()` function near the bottom of the code, Add the line `dht.begin();` above the `//LMIC init` comment. The setup function should now look like this:
+
+```C++
+void setup() {
+    Serial.begin(9600);
+    Serial.println(F("Starting"));
+
+    #ifdef VCC_ENABLE
+    // For Pinoccio Scout boards
+    pinMode(VCC_ENABLE, OUTPUT);
+    digitalWrite(VCC_ENABLE, HIGH);
+    delay(1000);
+    #endif
+
+    dht.begin();
+
+    // LMIC init
+    os_init();
+    // Reset the MAC state. Session and pending data transfers will be discarded.
+    LMIC_reset();
+
+    // Start job (sending automatically starts OTAA too)
+    do_send(&sendjob);
+}
 ```
+Next, in the `void do_send(osjob_t* j)` function replace:
+
+```C++
+// Prepare upstream data transmission at the next possible time.
+LMIC_setTxData2(1, mydata, sizeof(mydata)-1, 0);
+```
+
+with the following code:
+
+```C++
         // Reading temperature or humidity takes about 250 milliseconds!
         // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
         float humidity = dht.readHumidity();
         float temperature = dht.readTemperature();
-  
+
         // Check if any reads failed and exit early (to try again).
         if (isnan(humidity) || isnan(temperature)) {
           Serial.println(F("Failed to read from DHT sensor!"));
           return;
         }
- 
-        // Multiply by 100 to convert to remove decimal places
+
+        // Multiply by 100 to convert to move the decimal places (required for transmission)
         int humidityInt = humidity * 100;
         int temperatureInt = temperature * 100;
         int heatIndexInt = dht.computeHeatIndex(temperature, humidity, false) * 100;
 
-  
         //Break the humidity, temperature and heat index into Bytes in individual buffer arrays
         byte payloadA[2];
         payloadA[0] = highByte(humidityInt);
         payloadA[1] = lowByte(humidityInt);
-        byte payloadB[2]; 
+        byte payloadB[2];
         payloadB[0] = highByte(temperatureInt);
         payloadB[1] = lowByte(temperatureInt);
-        byte payloadC[2]; 
+        byte payloadC[2];
         payloadC[0] = highByte(heatIndexInt);
         payloadC[1] = lowByte(heatIndexInt);
 
@@ -112,22 +140,44 @@ DHT dht(DHTPIN, DHTTYPE);
         Serial.print(temperatureInt);
         Serial.print(F(" Heat index °C "));
         Serial.println(heatIndexInt);
-```
-- Then replace the line `LMIC_setTxData2(1, mydata, sizeof(mydata) - 1, 0);` just below to `LMIC_setTxData2(1, payload, sizeof(payload), 0);`
-### What does this do?
-Every 60 seconds (or whatever the `TX_INTERVAL` variable is set to) this will take the Humidity and Temperature from the sensor.
-Then it will calculate the heat index and multiply the humidity, temperature, and heat index by 100 so that the integers now have 2 decimal points of precision and we can convert them back later on.
-It then goes through a process of converting the numbers into a buffer array of bytes that can be sent to The Things Network. You can learn more about this process [here](https://www.thethingsnetwork.org/docs/devices/bytes.html).
-Then we change the data that is being sent from the text from `mydata` to our numbers in `payload`
 
-## Step 5 - Decoding the message
+        // Prepare upstream data transmission at the next possible time.
+        LMIC_setTxData2(1, payload, sizeof(payload), 0);
+```
+
+### What does this do?
+Every `TX_INTERVAL` (60 seconds by default) it will:
+1. Read the Humidity and Temperature values from the sensor.
+1. Calculate the heat index and multiply the humidity, temperature, and heat index by 100 so that the **integers** now have 2 decimal points of precision
+    - We can convert them back to decimal at The Things Network end.
+1. Convert the numbers into a buffer array of bytes that can be sent to The Things Network.
+    - You can learn more about this process [here](https://www.thethingsnetwork.org/docs/devices/bytes.html).
+1. Queue the data stored in `payload` for transmission.
+
+### Testing
+1. Connect the Arduino to your computer using the USB cable.
+1. In the Arduino IDE ensure that the correct port is selected by going to `Tools -> Port:` and check that the Arduino's is selected
+1. Ensure that the correct board is selected by going to `Tools -> Boards: <..> -> Arduino AVR Boards` and selecting the type of board you have
+1. Finally click the arrow button in the top left to upload your code to the Arduino.
+1. You should see a 'successful upload' message in the bottom of the Arduino IDE
+
+After it has finished uploading you can check the monitor at `Tools -> Serial Monitor` to see if it is working. You should see it connect to The Things Network, make measurements and send those measurements.
+
+You can also now go to the `Data` tab on your The Things Network application to see the data being sent.
+
+*Remember: Don't be worried if it fails to connect a few times*
+
+![Connect & Measure Successful](readme-images/connect-and-send.png)
+
+## Step 4 - Decoding the message
 Now that we have encoded the message and sent it to The Things Network we need to tell the things network what to do with it.
 
-- In your application on The Things Network, go to the tab named `Payload Formats`
+In your application on The Things Network, go to the tab named `Payload Formats`
 
-- In here we can write code to decrypt the data we get from our device.
-- Enter the following into the decoder
-```
+In here we can write code to decrypt the data we get from our device.
+
+Enter the following into the decoder:
+```C++
 function Decoder(bytes, port) {
   // Decode an uplink message from a buffer
   var decoded = {};
@@ -135,7 +185,7 @@ function Decoder(bytes, port) {
   var Val1 = bytes.slice(0, 2);
   var Val2 = bytes.slice(2, 4);
   var Val3 = bytes.slice(4, 6);
-  
+
   //Convert the buffers into numbers and divide by 100 to return them to 2 decimal places
   //Then save them to the decoded array
   decoded.myValA = ((Val1[0] << 8) + Val1[1]) / 100;
@@ -150,18 +200,19 @@ function Decoder(bytes, port) {
   };
 }
 ```
-The Code first separates the long buffer array we created in step 4 into the buffers that make up the Humidity, temperature, and heat index.
+
+The Code first separates the long buffer array we created in the Arduino code back into the buffers that make up the Humidity, temperature, and heat index.
+
 It then decodes each of the buffers into numbers, divides the numbers by 100 to turn them back into their original values and saves them into the decoded array.
-Finally the numbers are returned as field 1, field 2 and field 3 so they can be sent to ThingSpeak.
 
-- Click the `Save payload functions` button
+Finally the numbers are returned as field 1, field 2 and field 3.
 
-## Step 6 - Testing everything
-If everything up to this point has gone well, all that’s left to do is start the program.
-- Connect the Arduino to your computer using the usb cable.
-- In the Arduino IDE ensure that the correct port is selected by going to `Tools > Port:` and check that the Arduino's is selected
-- Ensure that the correct board is selected by going to `Tools > Board: > Arduino AVR Boards` and selecting the type of board you have
-- Finally click the arrow button in the top left to upload your code to the Arduino
+![Decode](readme-images/decoder.png)
 
-After it has finished uploading you can check the monitor at `Tools > Serial Monitor` to see if it is working.
-You can also now go to the Private view of the ThingSpeak channel you set up earlier and see that a new data entry will be entered every 60 seconds (or whatever the `TX_INTERVAL` variable is set to in the Arduino code)
+Be sure to click the `save payload functions` button at the bottom!
+
+### The Decoded Message
+
+You can also now go to the `Data` tab on your The Things Network application to see the data being sent, just like before, but now the "decoded" values are shown as well.
+
+![Decoded Payload](readme-images/decoded-payload.png)
