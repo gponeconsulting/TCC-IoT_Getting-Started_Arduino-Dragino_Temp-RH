@@ -40,11 +40,11 @@ Building on the setup completed in `Getting Started with the Arduino and Dragino
 ![Arduino Physical Setup](readme-images/physical-setup.jpg)
 
 ## Step 3 - The Arduino Code
-Now that the sensor is connected to the Arduino, the code needs to be modified from the `Dragino Lora Shield Guide` to send the sensor data instead of the static letters in the myData variable.
+Now that the sensor is connected to the Arduino, the code needs to be modified from the `Getting Started with the Arduino and Dragino guide` to send the sensor data instead of the static letters in the myData variable.
 
-> Make sure you get the code from the `Dragino Lora Shield Guide` which importantly has the APPEUI, DEVEUI, APPKEY and Pin Mapping configuration correct.
+> Make sure you get the code from the `Getting Started with the Arduino and Dragino guide` which importantly has the APPEUI, DEVEUI, APPKEY and Pin Mapping configuration correct.
 
-Open up a copy of the Arduino IDE code you created in the `Dragino Lora Shield Guide`.
+Open up a copy of the Arduino IDE code you created in the `Getting Started with the Arduino and Dragino guide`.
 
 Near the top of the code under the `#include <SPI.h>` line, add the following code
 
