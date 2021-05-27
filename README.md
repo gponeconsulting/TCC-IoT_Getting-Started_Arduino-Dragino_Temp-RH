@@ -1,17 +1,17 @@
 # Temperature & Humidity (with Arduino + Dragino Lora Shield)
-This guide is a continuation of the `Getting Started with the Arduino and Dragino Guide` and will make use of the application (on The Things Network) and device (physical Arduino + Dragino) set up during that guide. If you haven't followed the previous guide you will need to do that first, and  have:
+This guide is a continuation of the `Getting Started with the Arduino and Dragino Guide` and will make use of the application (on The Things Stack) and device (physical Arduino + Dragino) set up during that guide. If you haven't followed the previous guide you will need to do that first, and  have:
 - The Arduino and Dragino connected correctly, with an antenna
 - The Arduino connected your computer, and communicating correctly
 - The Arduino IDE installed
 - The `MCCI LoRaWAN LMIC library` installed and configured correctly, and
-- The Arduino/Dragino registered and communicating with The Things Network
+- The Arduino/Dragino registered and communicating with The Things Stack
 
 ## What you will need
 To follow this guide, you will The setup from the previous guide, with the addition of:
 - A Keyestudio DHT22 Temperature and Humidity Sensor Module
 - A breadboard and 3 wires OR some other way to connect the sensor to the Arduino
 
-You will still need to be in range of a Gateway connected to The Things Network which you can find out about [here](https://www.thethingsnetwork.org/community).
+You will still need to be in range of a Gateway connected to The Things Stack which you can find out about [here](https://www.thethingsnetwork.org/community).
 
 ## Step 1 - Install Library
 Install a library to help use the soil moisture sensor.
@@ -149,8 +149,8 @@ with the following code:
 Every `TX_INTERVAL` (60 seconds by default) it will:
 1. Read the Humidity and Temperature values from the sensor.
 1. Calculate the heat index and multiply the humidity, temperature, and heat index by 100 so that the **integers** now have 2 decimal points of precision
-    - We can convert them back to decimal at The Things Network end.
-1. Convert the numbers into a buffer array of bytes that can be sent to The Things Network.
+    - We can convert them back to decimal at The Things Stack end.
+1. Convert the numbers into a buffer array of bytes that can be sent to The Things Stack.
     - You can learn more about this process [here](https://www.thethingsnetwork.org/docs/devices/bytes.html).
 1. Queue the data stored in `payload` for transmission.
 
@@ -161,18 +161,18 @@ Every `TX_INTERVAL` (60 seconds by default) it will:
 1. Finally click the arrow button in the top left to upload your code to the Arduino.
 1. You should see a 'successful upload' message in the bottom of the Arduino IDE
 
-After it has finished uploading you can check the monitor at `Tools -> Serial Monitor` to see if it is working. You should see it connect to The Things Network, make measurements and send those measurements.
+After it has finished uploading you can check the monitor at `Tools -> Serial Monitor` to see if it is working. You should see it connect to The Things Stack, make measurements and send those measurements.
 
-You can also now go to the `Data` tab on your The Things Network application to see the data being sent.
+You can also now go to the `Live Data` tab on your The Things Stack application to see the data being sent.
 
 *Remember: Don't be worried if it fails to connect a few times*
 
 ![Connect & Measure Successful](readme-images/connect-and-send.png)
 
 ## Step 4 - Decoding the message
-Now that we have encoded the message and sent it to The Things Network we need to tell the things network what to do with it.
+Now that we have encoded the message and sent it to The Things Stack we need to tell the things stack what to do with it.
 
-In your application on The Things Network, go to the tab named `Payload Formats`
+In your application on The Things Stack, go to the tab named `Payload Formatters`
 
 In here we can write code to decrypt the data we get from our device.
 
@@ -213,6 +213,5 @@ Be sure to click the `save payload functions` button at the bottom!
 
 ### The Decoded Message
 
-You can also now go to the `Data` tab on your The Things Network application to see the data being sent, just like before, but now the "decoded" values are shown as well.
+You can also now go to the `Live Data` tab on your The Things Stack application to see the data being sent, just like before, but now the "decoded" values are shown as well.
 
-![Decoded Payload](readme-images/decoded-payload.png)
